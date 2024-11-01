@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
@@ -6,7 +8,7 @@ use bevy::ecs::query::QuerySingleError;
 use crate::{
     asset_loader::SceneAssets,
     collision::CollisionDamage,
-    despawn::DespawnOnDie,
+    despawn::{DespawnOnDie, DespawnTimer},
     health::{DieEvent, Health},
     movement::{Acceleration, AngularVelocity, ConfinedToPlayArea, MovingObjectBundle, Velocity},
     schedule::InGameSet,
@@ -20,8 +22,9 @@ const SPACESHIP_ACCELERATION: f32 = 1.0;
 const SPACESHIP_ROTATION_SPEED: f32 = 2.5;
 const SPACESHIP_ROLL_SPEED: f32 = 0.1;
 const MISSILE_SPEED: f32 = 50.0;
+const MISSILE_LIFESPAN_MILLIS: u64 = 3000;
 const MISSILE_FORWARD_SCALAR: f32 = 7.5;
-const WEAPON_FIRE_RATE: f32 = 5.0;
+const WEAPON_FIRE_RATE: f32 = 10.0;
 
 /// Marker component for the player's spaceship.
 #[derive(Component, Debug)]
@@ -200,6 +203,7 @@ fn spaceship_weapon_controls(
         Health::new(2.5),
         DespawnOnDie,
         ConfinedToPlayArea,
+        DespawnTimer::new(Duration::from_millis(MISSILE_LIFESPAN_MILLIS))
     ));
 }
 
